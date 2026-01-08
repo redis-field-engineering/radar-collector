@@ -7,7 +7,7 @@ A telemetry collector that collects Redis metrics from configured deployments an
 Radar Collector connects to one or more Redis instances or deployments, collects metrics and configuration data at regular intervals, and forwards this data to a central gRPC server. The collector supports various Redis deployment types including:
 
 - Standalone instances
-- Redis Enterprise clusters
+- Redis Software clusters
 - OSS clusters
 
 ## Documentation

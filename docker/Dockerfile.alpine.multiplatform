@@ -14,11 +14,11 @@ RUN apk add --no-cache \
     adduser -D -g "" appuser
 
 # Create necessary directories
-RUN mkdir -p /certs /etc/collector /home/appuser/bin && \
-    chown -R appuser:appuser /certs /etc/collector /home/appuser
+RUN mkdir -p /certs /etc/radar /home/appuser/bin && \
+    chown -R appuser:appuser /certs /etc/radar /home/appuser
 
 # Copy default config (customers may override via volume)
-COPY --chown=appuser:appuser radar-collector-config-sample.yml /etc/collector/config.yaml
+COPY --chown=appuser:appuser radar-collector-config-sample.yml /etc/radar/radar-collector.yml
 
 # Copy the correct binary based on architecture
 # For Alpine, we use musl binaries for both AMD64 and ARM64
@@ -34,16 +34,16 @@ RUN if [ "$TARGETARCH" = "amd64" ]; then \
 USER appuser
 
 # Environment defaults
-ENV COLLECTOR_CONFIG=/etc/collector/config.yaml \
+ENV COLLECTOR_CONFIG=/etc/radar/radar-collector.yml \
     COLLECTOR_TLS_CERT=/certs/server.pem \
     COLLECTOR_TLS_KEY=/certs/server.key
 
 # Expose volumes for certs and config
-VOLUME ["/certs", "/etc/collector"]
+VOLUME ["/certs", "/etc/radar"]
 
 # Healthcheck for orchestrators
 HEALTHCHECK --interval=30s --timeout=5s \
   CMD ["radar-collector", "--health"] || exit 1
 
 ENTRYPOINT ["radar-collector"]
-CMD ["--config", "/etc/collector/config.yaml"]
+CMD ["--config", "/etc/radar/radar-collector.yml"]

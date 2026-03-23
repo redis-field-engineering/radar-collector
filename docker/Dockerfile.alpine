@@ -11,11 +11,11 @@ RUN apk add --no-cache ca-certificates
 
 # Create non-root user and necessary directories
 RUN adduser -D appuser \
-  && mkdir -p /certs /etc/collector /home/appuser/bin \
-  && chown -R appuser:appuser /certs /etc/collector /home/appuser
+  && mkdir -p /certs /etc/radar /home/appuser/bin \
+  && chown -R appuser:appuser /certs /etc/radar /home/appuser
 
 # Copy default config (customers may override via volume)
-COPY --chown=appuser:appuser radar-collector-config-sample.yml /etc/collector/config.yaml
+COPY --chown=appuser:appuser radar-collector-config-sample.yml /etc/radar/radar-collector.yml
 
 # Copy the collector binary
 COPY ${BINARY} /usr/local/bin/radar-collector
@@ -24,16 +24,16 @@ USER appuser
 
 # Environment defaults
 ENV PATH="/home/appuser/bin:${PATH}" \
-  COLLECTOR_CONFIG=/etc/collector/config.yaml \
+  COLLECTOR_CONFIG=/etc/radar/radar-collector.yml \
   COLLECTOR_TLS_CERT=/certs/server.pem \
   COLLECTOR_TLS_KEY=/certs/server.key
 
 # Expose volumes for certs and config
-VOLUME ["/certs", "/etc/collector"]
+VOLUME ["/certs", "/etc/radar"]
 
 # Healthcheck for orchestrators
 HEALTHCHECK --interval=30s --timeout=5s \
   CMD ["radar-collector", "--health"] || exit 1
 
 ENTRYPOINT ["radar-collector"]
-CMD ["--config", "/etc/collector/config.yaml"]
+CMD ["--config", "/etc/radar/radar-collector.yml"]
